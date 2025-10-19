@@ -1,0 +1,49 @@
+1. Display top 5 highest salary earners in each dept
+
+
+SELECT *
+FROM (
+    SELECT e.*, 
+           DENSE_RANK() OVER (PARTITION BY dept_id ORDER BY salary DESC) AS rnk
+    FROM employees e
+) AS ranked
+WHERE rnk <= 5;
+
+
+
+2.  Stored Function: getWorkingDays
+
+DELIMITER //
+CREATE FUNCTION getWorkingDays(join_date DATE)
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE today DATE DEFAULT CURDATE();
+    DECLARE total_days INT;
+
+    SET total_days = DATEDIFF(today, join_date);
+    RETURN total_days;
+END //
+DELIMITER ;
+
+
+3. Stored Procedure: Update Salary Based on Working Days
+DELIMITER //
+CREATE PROCEDURE updateSalaryByDays(IN emp_id INT)
+BEGIN
+    DECLARE days INT;
+    DECLARE new_salary DECIMAL(10,2);
+
+    SELECT getWorkingDays(joining_date) INTO days FROM employees WHERE employee_id = emp_id;
+
+    IF days > 300 THEN
+        SET new_salary = salary * 1.20; -- 20% increment
+    ELSEIF days > 200 THEN
+        SET new_salary = salary * 1.10; -- 10% increment
+    ELSE
+        SET new_salary = salary * 1.05; -- 5% increment
+    END IF;
+
+    UPDATE employees SET salary = new_salary WHERE employee_id = emp_id;
+END //
+DELIMITER ;

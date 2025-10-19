@@ -1,0 +1,16 @@
+You are given an array of strings. Find the length of the longest string.
+
+
+public class LongestString {
+    public static void main(String[] args) {
+        String[] arr = {"chetan", "manish", "Mayur", "Devyani", "Vicky"};
+        int maxLen = 0;
+
+        for (String s : arr) {
+            if (s.length() > maxLen)
+                maxLen = s.length();
+        }
+
+        System.out.println("Length of longest string: " + maxLen);
+    }
+}
